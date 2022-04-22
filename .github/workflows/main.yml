@@ -1,0 +1,26 @@
+name: refresh-resolvers
+on:
+  schedule:
+  # Run daily
+  - cron:  '0 */2 * * *'
+  workflow_dispatch:
+
+jobs:
+     validate_dns_name_servers:
+       runs-on: ubuntu-latest
+       steps:
+        - uses: actions/checkout@v2
+        - name: Install and run dnsvalidator against https://public-dns.info/nameservers.txt
+          run: |
+            git clone https://github.com/vortexau/dnsvalidator
+            cd dnsvalidator
+            sudo python3 setup.py install
+            rm ../resolvers.txt || true
+            dnsvalidator -tL https://public-dns.info/nameservers.txt -threads 40 -o  ../resolvers.txt
+            sed -i '/^$/d' ../resolvers.txt
+        - name: Config git and push
+          run: |
+            git config --global user.name "resolver"
+            git add resolvers.txt
+            git commit -m "Update resolvers using https://public-dns.info/nameservers.txt as source"
+            git push

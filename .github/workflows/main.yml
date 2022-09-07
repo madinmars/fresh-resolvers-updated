@@ -16,7 +16,7 @@ jobs:
             cd dnsvalidator
             sudo python3 setup.py install
             rm ../resolvers.txt || true
-            dnsvalidator -tL https://public-dns.info/nameservers.txt -threads 40 -o  ../resolvers.txt
+            dnsvalidator -tL https://public-dns.info/nameservers.txt -threads 40 -o  ../resolvers.txt # ToDo sometimes I got 502, so I need to loop
             sed -i '/^$/d' ../resolvers.txt
         - name: Config git and push
           run: |
